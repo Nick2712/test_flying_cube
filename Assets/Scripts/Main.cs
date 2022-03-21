@@ -15,11 +15,12 @@ namespace TestFlyingCube
         [SerializeField] private UIView _uiView;
         [SerializeField] private GameObject _cube;
         [SerializeField] private Camera _camera;
+        [SerializeField] private Button _closeButton;
 
         private float _spawnTime = 0.5f;
         private float _speed = 10;
         private float _distance = 10;
-        private bool _isActionStart;
+        private bool _isAction;
         private float _timeToSpawn;
 
         private void Start()
@@ -27,13 +28,18 @@ namespace TestFlyingCube
             _uiView.SpawnTime.text = _spawnTime.ToString();
             _uiView.Speed.text = _speed.ToString();
             _uiView.Distance.text = _distance.ToString();
+
             _uiView.Start.onClick.AddListener(OnStartAction);
+
             _uiView.SpawnTime.onEndEdit.AddListener(OnSpawnTimeChange);
             _uiView.Speed.onEndEdit.AddListener(OnSpeedChange);
             _uiView.Distance.onEndEdit.AddListener(OnDistanceChange);
+
             SetInfoField(_uiView.SpeedInfo, MIN_SPEED, MAX_SPEED);
             SetInfoField(_uiView.SpawnTimeInfo, MIN_SPAWN_TIME, MAX_SPAWN_TIME);
             SetInfoField(_uiView.DistanceInfo, MIN_DISTANCE, MAX_DISTANCE);
+
+            _closeButton.onClick.AddListener(OnCloseButton);
         }
 
         private void Update()
@@ -46,17 +52,11 @@ namespace TestFlyingCube
                     SetAction(true);
                 }
             }
-
-            if(Input.GetKeyDown(KeyCode.Escape))
-            {
-                if (_uiView.gameObject.activeInHierarchy) Application.Quit();
-                else ResetAction();
-            }
         }
 
         private void FixedUpdate()
         {
-            if(_isActionStart)
+            if(_isAction)
             {
                 MoveCube();
             }
@@ -81,7 +81,7 @@ namespace TestFlyingCube
         private void SetAction(bool isAction)
         {
             _cube.SetActive(isAction);
-            _isActionStart = isAction;
+            _isAction = isAction;
         }
 
         private void ResetAction()
@@ -128,7 +128,13 @@ namespace TestFlyingCube
 
         private void SetInfoField(Text infoField, float minValue, float maxValue)
         {
-            infoField.text = infoField.text + $" {minValue} - {maxValue}";
+            infoField.text += $" {minValue}-{maxValue}";
+        }
+
+        private void OnCloseButton()
+        {
+            if (_uiView.gameObject.activeInHierarchy) Application.Quit();
+            else ResetAction();
         }
     }
 }
